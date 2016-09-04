@@ -9,11 +9,12 @@ html,body{
 	width: 100%;
 	height: 100%;
 }
-#photowall{
+#container{
 	width: 100%;
 	height: 100%;
 }
-.state{
+.stage{
+	position: relative;
 	width: 100%;
 	height: 100%;
 	background: #ccc;
@@ -25,6 +26,8 @@ html,body{
 	text-align: center;
 	padding-top: 40px;
 	position: absolute;
+	transition:all 0.5s ease-in-out;
+	cursor: pointer;
 }
 figcaption{
 	margin-top: 20px;
