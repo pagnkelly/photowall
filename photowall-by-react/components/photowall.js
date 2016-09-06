@@ -3,28 +3,52 @@
 		return Math.ceil(Math.random()*(high-low)+low);
 	}
 	var ImgFigure=React.createClass({
+		handleClick:function(){
+			if(this.props.isCenter){
+				this.props.inverse();
+			}else{
+				this.props.center();
+			}
+		},
 		render:function(){
 			var styleObj={
 				left:this.props.info.pos.left,
 				top:this.props.info.pos.top,
 				transform:'rotate('+this.props.info.rotate+'deg)'
 			}
+			if(this.props.isInverse){
+				styleObj.transform = 'rotateY(180deg)';
+			}
 			return (
 
-				<figure className="imgFigure" style={styleObj} onClick={this.props.center}>
+				<figure className="imgFigure" style={styleObj} onClick={this.handleClick}>
 					<img src={"imgs/"+this.props.data.fileName}/>
 					<figcaption>
 						<h2>{this.props.data.title}</h2>
-						<div></div>
+						<div className="img-back">{this.props.data.desc}</div>
 					</figcaption>
 				</figure>
 				);
 		}
 	});
 	var Controller=React.createClass({
+		handleClick:function(){
+			if(this.props.arrange.isCenter){
+                this.props.inverse();
+            }else{
+                this.props.center();
+            }
+		},
 		render:function(){
+			var controllerUnitClassName='controller';
+			if(this.props.arrange.isCenter){
+                controllerUnitClassName += ' is-center';
+                if(this.props.arrange.isInverse){
+                    controllerUnitClassName += ' is-inverse';
+                }
+            }
 			return (
-				<span></span>
+				<span className={controllerUnitClassName} onClick={this.handleClick}></span>
 				);
 		}
 	});
@@ -50,7 +74,9 @@
 							top:0,
 							left:0
 						},
-						rotate:0
+						rotate:0,
+						isCenter:false,
+						isInverse : false
 					}
 				]
 			}
@@ -60,6 +86,7 @@
 			var hRangeLR=null;
 			imgInfoArr[centerIndex].pos=this.Const.centerPos;
 			imgInfoArr[centerIndex].rotate=0;
+			imgInfoArr[centerIndex].isCenter=true;
 			for(var i=0;i<imgInfoArr.length;i++){
 				if(i==centerIndex){
 					continue;
@@ -75,6 +102,8 @@
 					left:getRangeRandom(hRangeLR[0],hRangeLR[1])
 				}
 				imgInfoArr[i].rotate=getRangeRandom(-30,30);
+				imgInfoArr[i].isCenter=false;
+				imgInfoArr[i].isInverse = false;
 			}
 			
 
@@ -85,6 +114,14 @@
 		center:function(index){
 			return function(){
 				this.rearrage(index);
+			}.bind(this);
+		},
+		inverse : function(index){
+			return function(){
+				this.state.imgInfoArr[index].isInverse = !this.state.imgInfoArr[index].isInverse;
+				this.setState({
+					imgInfoArr : this.state.imgInfoArr
+				});
 			}.bind(this);
 		},
 		componentDidMount:function(){
@@ -120,21 +157,26 @@
 							top:0,
 							left:0
 						},
-						rotate:0
+						rotate:0,
+						isCenter : false,
+						isInverse : false
+
 					}
 				}
 				imgFigureArr.push(<ImgFigure data={value} key={index} 
 					info={this.state.imgInfoArr[index]} ref={"imgFigure"+index}
+					center={this.center(index)} isCenter={this.state.imgInfoArr[index].isCenter}
+					inverse={this.inverse(index)} isInverse={this.state.imgInfoArr[index].isInverse}/>);
+				contorllerArr.push(<Controller key={index} arrange={this.state.imgInfoArr[index]} inverse={this.inverse(index)}
 					center={this.center(index)}/>);
-				contorllerArr.push(<Controller key={index}/>);
 			}.bind(this));
 			return (
 				<section className="stage" ref="stage">
 					<section>
 					{imgFigureArr}
 					</section>
-					<nav>
-					{contorllerArr}
+					<nav className="nav">
+						{contorllerArr}
 					</nav>
 				</section>
 				);
